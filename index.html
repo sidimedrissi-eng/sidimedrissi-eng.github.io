@@ -1,47 +1,19 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head> 
-<!-- Google tag (gtag.js) -->
-<script async src="https://googletagmanager.com"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-5WHLD6GBZB');
-</script>
-<!-- Code automatique Google AdSense -->
-<script async src="https://googlesyndication.com" crossorigin="anonymous"></script>
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Tableau de bord financier éducatif et simulation de gestion.">
   <title>Tableau de bord financier</title>
+
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3749218401763449" crossorigin="anonymous"></script>
   <style>
     *{box-sizing:border-box}
     body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#17202a}
     .app{max-width:1200px;margin:auto;padding:24px}
     header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px}
     h1,h2,h3{margin-top:0}
-    .tiktok-btn {
-      display: inline-flex;
-      align-items: center;
-      background-color: #010101;
-      color: #ffffff;
-      padding: 10px 20px;
-      border-radius: 25px;
-      text-decoration: none;
-      font-family: sans-serif;
-      font-weight: bold;
-      font-size: 14px;
-      transition: transform 0.2s;
-      margin: 15px 0;
-    }
-    .tiktok-btn:hover {
-      transform: scale(1.05);
-    }
-    .tiktok-icon {
-      margin-right: 8px;
-      font-size: 16px;
-    }
     .sub{color:#667085}
     .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
     .card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 3px 14px rgba(0,0,0,.07);margin-bottom:16px}
@@ -79,8 +51,6 @@
     @media(max-width:800px){.metrics{grid-template-columns:repeat(2,1fr)}.row3{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}
     @media(max-width:520px){.app{padding:14px}.metrics{grid-template-columns:1fr}.row{grid-template-columns:1fr}.card{padding:15px}}
   </style>
-  <!-- Chargement de Chart.js pour le graphique -->
-  <script src="https://jsdelivr.net"></script>
 </head>
 <body>
   <div class="app">
@@ -91,12 +61,6 @@
       </div>
       <button class="danger" type="button" id="resetBtn">Réinitialiser les données</button>
     </header>
-
-    <div style="text-align: center; margin-bottom: 25px;">
-      <a href="https://tiktok.com" target="_blank" class="tiktok-btn">
-        <span class="tiktok-icon">🎵</span> Soutenir mon ami sur TikTok
-      </a>
-    </div>
 
     <section class="card">
       <h2>Paramètres financiers</h2>
@@ -146,37 +110,404 @@
     <section class="card">
       <h2>Offres et produits</h2>
       <div class="row3">
-        <div><label for="offerName">Nom de l’offre / produit</label><input id="offerName" type="text" placeholder="Ex. Service Pro"></div>
-        <div><label for="offerPrice">Prix unitaire</label><input id="offerPrice" type="number" step="0.01" min="0" value="100"></div>
-        <div class="actions" style="align-items:end"><button type="button" id="addOfferBtn">Créer l’offre</button></div>
+        <div><label for="offerName">Nom de l’offre / produit</label><input id="offerName" type="text" placeholder="Ex. Produit A"></div>
+        <div><label for="offerPerson">Personne à l’origine de l’offre</label><select id="offerPerson"></select></div>
+        <div><label for="offerAmount">Montant de l’offre</label><input id="offerAmount" type="number" step="0.01"></div>
       </div>
-      <div id="offersList" class="directory"></div>
+      <div class="row3" style="margin-top:12px">
+        <div><label for="offerCharge">Charge facultative</label><input id="offerCharge" type="number" step="0.01" min="0" value="0"></div>
+        <div><label for="offerDate">Date</label><input id="offerDate" type="datetime-local"></div>
+        <div class="actions" style="align-items:end"><button type="button" id="addOfferBtn">Enregistrer l’offre</button></div>
+      </div>
+      <div id="offersList"></div>
+    </section>
+
+    <section class="card">
+      <h2>Gains et pertes</h2>
+      <div class="row3">
+        <div><label for="gainName">Nom de l’opération</label><input id="gainName" type="text" placeholder="Ex. Vente A"></div>
+        <div><label for="gainAmount">Montant</label><input id="gainAmount" type="number" step="0.01" placeholder="Ex. 10 ou -1"></div>
+        <div><label for="gainDate">Date</label><input id="gainDate" type="datetime-local"></div>
+      </div>
+      <div class="row3" style="margin-top:12px">
+        <div><label for="gainGiver">Personne qui donne</label><select id="gainGiver"></select></div>
+        <div><label for="gainReceiver">Personne qui reçoit</label><select id="gainReceiver"></select></div>
+        <div><label for="gainProduct">Produit, facultatif</label><select id="gainProduct"></select></div>
+      </div>
+      <div class="actions" style="margin-top:12px"><button type="button" id="addGainBtn">Ajouter au graphique</button></div>
+      <div class="small" style="margin-top:10px">Un montant positif augmente le total. Un montant négatif le diminue.</div>
+      <div id="historyList" class="history"></div>
+    </section>
+
+    <section class="card">
+      <h2>Évolution dans le temps <span class="info" data-definition="Chaque point représente une variation. Le total cumulé commence à zéro puis augmente ou diminue selon les gains et pertes.">?</span></h2>
+      <canvas id="timeChart"></canvas>
+    </section>
+
+    <section class="card">
+      <h2>Simulation d’opération</h2>
+      <div class="small" style="margin-bottom:12px">Cette partie sert uniquement à simuler une opération et à calculer son résultat. Elle ne réalise aucun achat ni aucune vente réelle.</div>
+      <div class="row3">
+        <div><label for="tradeDemand">Demande / quantité</label><input id="tradeDemand" type="number" step="1" min="0" value="1"></div>
+        <div><label for="tradeOffer">Montant de l’offre</label><input id="tradeOffer" type="number" step="0.01"></div>
+        <div><label for="tradeResale">Montant de revente simulé</label><input id="tradeResale" type="number" step="0.01"></div>
+      </div>
+      <div class="row3" style="margin-top:12px">
+        <div><label for="tradeGiver">Personne qui donne</label><select id="tradeGiver"></select></div>
+        <div><label for="tradeReceiver">Personne qui reçoit</label><select id="tradeReceiver"></select></div>
+        <div><label for="tradeProduct">Produit / offre</label><select id="tradeProduct"></select></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <div><label for="tradeCharge">Charge facultative</label><input id="tradeCharge" type="number" step="0.01" min="0" value="0"></div>
+      </div>
+      <div style="margin-top:14px"><strong>Bénéfice simulé :</strong> <span id="tradeProfit">0 EUR</span></div>
+      <div class="actions">
+        <button type="button" id="saveTradeBtn">Enregistrer la simulation</button>
+        <button type="button" id="saveTradeGraphBtn">Enregistrer + ajouter au graphique</button>
+      </div>
+      <div id="tradesList"></div>
+    </section>
+
+    <section class="card">
+      <h2>Répertoire des interactions</h2>
+      <div class="row">
+        <div><label for="directoryPersonFilter">Filtrer par personne</label><select id="directoryPersonFilter"></select></div>
+        <div><label for="directoryProductFilter">Filtrer par produit</label><select id="directoryProductFilter"></select></div>
+      </div>
+      <div id="directory" class="directory"></div>
     </section>
   </div>
 
+  <div id="tip" class="tip"></div>
+
   <script>
-    // Liste des principales devises mondiales
-    const currencies = [
-      { code: 'EUR', name: 'Euro' },
-      { code: 'MAD', name: 'Dirham Marocain' },
-      { code: 'USD', name: 'Dollar Américain' },
-      { code: 'CAD', name: 'Dollar Canadien' },
-      { code: 'CHF', name: 'Franc Suisse' },
-      { code: 'GBP', name: 'Livre Sterling' },
-      { code: 'DZD', name: 'Dinar Algérien' },
-      { code: 'TND', name: 'Dinar Tunisien' }
+    'use strict';
+
+    var CURRENCIES = [
+      ['AED','Dirham des Émirats arabes unis'],['AFN','Afghani'],['ALL','Lek albanais'],['AMD','Dram arménien'],['ANG','Florin des Antilles'],['AOA','Kwanza'],['ARS','Peso argentin'],['AUD','Dollar australien'],['AWG','Florin arubais'],['AZN','Manat azerbaïdjanais'],['BAM','Mark convertible'],['BBD','Dollar de la Barbade'],['BDT','Taka bangladais'],['BGN','Lev bulgare'],['BHD','Dinar bahreïni'],['BIF','Franc burundais'],['BMD','Dollar bermudien'],['BND','Dollar de Brunei'],['BOB','Boliviano'],['BRL','Real brésilien'],['BSD','Dollar bahaméen'],['BTN','Ngultrum'],['BWP','Pula'],['BYN','Rouble biélorusse'],['BZD','Dollar bélizien'],['CAD','Dollar canadien'],['CDF','Franc congolais'],['CHF','Franc suisse'],['CLP','Peso chilien'],['CNY','Yuan chinois'],['COP','Peso colombien'],['CRC','Colon costaricien'],['CUP','Peso cubain'],['CVE','Escudo cap-verdien'],['CZK','Couronne tchèque'],['DJF','Franc djiboutien'],['DKK','Couronne danoise'],['DOP','Peso dominicain'],['DZD','Dinar algérien'],['EGP','Livre égyptienne'],['ERN','Nakfa'],['ETB','Birr éthiopien'],['EUR','Euro'],['FJD','Dollar fidjien'],['FKP','Livre des Falkland'],['GBP','Livre sterling'],['GEL','Lari géorgien'],['GHS','Cedi ghanéen'],['GIP','Livre de Gibraltar'],['GMD','Dalasi'],['GNF','Franc guinéen'],['GTQ','Quetzal'],['GYD','Dollar guyanien'],['HKD','Dollar de Hong Kong'],['HNL','Lempira'],['HRK','Kuna croate'],['HTG','Gourde haïtienne'],['HUF','Forint hongrois'],['IDR','Roupie indonésienne'],['ILS','Nouveau shekel israélien'],['INR','Roupie indienne'],['IQD','Dinar irakien'],['IRR','Rial iranien'],['ISK','Couronne islandaise'],['JMD','Dollar jamaïcain'],['JOD','Dinar jordanien'],['JPY','Yen japonais'],['KES','Shilling kényan'],['KGS','Som kirghize'],['KHR','Riel cambodgien'],['KMF','Franc comorien'],['KPW','Won nord-coréen'],['KRW','Won sud-coréen'],['KWD','Dinar koweïtien'],['KYD','Dollar des îles Caïmans'],['KZT','Tenge'],['LAK','Kip laotien'],['LBP','Livre libanaise'],['LKR','Roupie sri-lankaise'],['LRD','Dollar libérien'],['LSL','Loti'],['LYD','Dinar libyen'],['MAD','Dirham marocain'],['MDL','Leu moldave'],['MGA','Ariary malgache'],['MKD','Denar macédonien'],['MMK','Kyat birman'],['MNT','Tögrög'],['MOP','Pataca'],['MRU','Ouguiya'],['MUR','Roupie mauricienne'],['MVR','Rufiyaa'],['MWK','Kwacha malawite'],['MXN','Peso mexicain'],['MYR','Ringgit malaisien'],['MZN','Metical mozambicain'],['NAD','Dollar namibien'],['NGN','Naira nigérian'],['NIO','Córdoba'],['NOK','Couronne norvégienne'],['NPR','Roupie népalaise'],['NZD','Dollar néo-zélandais'],['OMR','Rial omanais'],['PAB','Balboa'],['PEN','Sol péruvien'],['PGK','Kina'],['PHP','Peso philippin'],['PKR','Roupie pakistanaise'],['PLN','Zloty'],['PYG','Guaraní'],['QAR','Riyal qatari'],['RON','Leu roumain'],['RSD','Dinar serbe'],['RUB','Rouble russe'],['RWF','Franc rwandais'],['SAR','Riyal saoudien'],['SBD','Dollar des îles Salomon'],['SCR','Roupie des Seychelles'],['SDG','Livre soudanaise'],['SEK','Couronne suédoise'],['SGD','Dollar de Singapour'],['SHP','Livre de Sainte-Hélène'],['SLE','Leone'],['SOS','Shilling somalien'],['SRD','Dollar surinamais'],['SSP','Livre sud-soudanaise'],['STN','Dobra'],['SVC','Colon salvadorien'],['SYP','Livre syrienne'],['SZL','Lilangeni'],['THB','Baht'],['TJS','Somoni'],['TMT','Manat turkmène'],['TND','Dinar tunisien'],['TOP','Pa’anga'],['TRY','Livre turque'],['TTD','Dollar de Trinité-et-Tobago'],['TWD','Nouveau dollar taïwanais'],['TZS','Shilling tanzanien'],['UAH','Hryvnia'],['UGX','Shilling ougandais'],['USD','Dollar américain'],['UYU','Peso uruguayen'],['UZS','Sum ouzbek'],['VES','Bolívar vénézuélien'],['VND','Dong vietnamien'],['VUV','Vatu'],['WST','Tala'],['XAF','Franc CFA BEAC'],['XCD','Dollar des Caraïbes orientales'],['XOF','Franc CFA BCEAO'],['XPF','Franc CFP'],['YER','Rial yéménite'],['ZAR','Rand sud-africain'],['ZMW','Kwacha zambien'],['ZWL','Dollar zimbabwéen']
     ];
 
-    let currentCurrency = 'EUR';
-    let chartInstance = null;
+    var STORAGE = {
+      people:'dashboardPeopleV2', offers:'dashboardOffersV2', trades:'dashboardTradesV2', gains:'dashboardGainsV2', recent:'dashboardRecentCurrenciesV2', currency:'dashboardCurrencyV2', finance:'dashboardFinanceV2'
+    };
 
-    // Éléments du DOM
-    const caInput = document.getElementById('ca');
-    const chargesInput = document.getElementById('charges');
-    const objectifInput = document.getElementById('objectif');
-    const currencySearch = document.getElementById('currencySearch');
-    const currencyResults = document.getElementById('currencyResults');
-    const selectedCurrencyText = document.getElementById('selectedCurrencyText');
+    var people = load(STORAGE.people, []);
+    var offers = load(STORAGE.offers, []);
+    var trades = load(STORAGE.trades, []);
+    var gains = load(STORAGE.gains, []);
+    var recentCurrencies = load(STORAGE.recent, ['EUR','MAD']);
+    var selectedCurrency = localStorage.getItem(STORAGE.currency) || 'EUR';
 
-    // Sauvegarde & Restauration Locale
-    function loadSavedData() {
+    function makeId(){ return String(new Date().getTime()) + String(Math.floor(Math.random()*100000)); }
+    function load(key, fallback){
+      try {
+        var v = localStorage.getItem(key);
+        return v ? JSON.parse(v) : fallback;
+      } catch(e) { return fallback; }
+    }
+    function save(key,value){
+      try { localStorage.setItem(key,JSON.stringify(value)); }
+      catch(e) { console.warn('Enregistrement local impossible',e); }
+    }
+    function esc(value){
+      var text = String(value == null ? '' : value);
+      return text.replace(/[&<>\'"]/g,function(c){
+        if(c==='&') return '&amp;';
+        if(c==='<') return '&lt;';
+        if(c==='>') return '&gt;';
+        if(c==="'") return '&#39;';
+        return '&quot;';
+      });
+    }
+    function number(id){ return Number(document.getElementById(id).value) || 0; }
+    function money(value){ return Number(value || 0).toLocaleString('fr-FR',{maximumFractionDigits:2})+' '+selectedCurrency; }
+    function pad2(n){ return n < 10 ? '0'+n : String(n); }
+    function nowInput(){
+      var d=new Date();
+      return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())+'T'+pad2(d.getHours())+':'+pad2(d.getMinutes());
+    }
+    function fmtDate(v){
+      if(!v) return '—';
+      var d=new Date(v);
+      return isNaN(d.getTime()) ? v : d.toLocaleString('fr-FR');
+    }
+    function findById(list,id){
+      var i;
+      for(i=0;i<list.length;i++){ if(list[i].id===id) return list[i]; }
+      return null;
+    }
+    function hasCode(list,code){ return list.indexOf(code)!==-1; }
+    function personName(id){ var p=findById(people,id); return p ? p.name : 'Moi / aucune personne'; }
+    function productName(id){ var o=findById(offers,id); return o ? o.name : 'Aucun produit'; }
+
+    function updateFinance(){
+      var ca=Math.max(0,number('ca'));
+      var charges=Math.max(0,number('charges'));
+      var objectif=Math.max(0,number('objectif'));
+      var benefice=ca-charges;
+      var marge=ca ? benefice/ca*100 : 0;
+      var ecart=ca-objectif;
+      document.getElementById('resultCA').textContent=money(ca);
+      document.getElementById('resultBenefice').textContent=money(benefice);
+      document.getElementById('resultMarge').textContent=marge.toFixed(1)+' %';
+      document.getElementById('resultEcart').textContent=(ecart>=0?'+':'')+money(ecart);
+      save(STORAGE.finance,{ca:ca,charges:charges,objectif:objectif});
+      drawBar([ca,charges,Math.max(0,benefice),objectif],['CA','Charges','Bénéfice','Objectif']);
+    }
+
+    function drawBar(values,labels){
+      var c=document.getElementById('chart');
+      var rect=c.getBoundingClientRect();
+      var d=window.devicePixelRatio||1;
+      var w=Math.max(300,rect.width),h=340;
+      c.width=w*d;c.height=h*d;
+      var ctx=c.getContext('2d');
+      ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,w,h);
+      var max=1,i;
+      for(i=0;i<values.length;i++){ if(values[i]>max) max=values[i]; }
+      var pad=55,base=h-50,slot=(w-pad*2)/values.length,bw=slot*.55;
+      ctx.font='14px Arial';ctx.textAlign='center';
+      for(i=0;i<values.length;i++){
+        var v=values[i],bh=v/max*(h-105),x=pad+i*slot+(slot-bw)/2,y=base-bh;
+        ctx.fillStyle='#315b9b';ctx.fillRect(x,y,bw,bh);
+        ctx.fillStyle='#17202a';ctx.fillText(labels[i],x+bw/2,base+25);ctx.fillText(Number(v).toLocaleString('fr-FR'),x+bw/2,Math.max(18,y-8));
+      }
+      ctx.strokeStyle='#cfd5dd';ctx.beginPath();ctx.moveTo(pad,base);ctx.lineTo(w-pad,base);ctx.stroke();
+    }
+
+    function normalizeRecords(){
+      var i;
+      for(i=0;i<gains.length;i++){if(gains[i].giver===undefined)gains[i].giver=gains[i].person||'';if(gains[i].receiver===undefined)gains[i].receiver='';}
+      for(i=0;i<trades.length;i++){if(trades[i].giver===undefined)trades[i].giver=trades[i].person||'';if(trades[i].receiver===undefined)trades[i].receiver='';}
+    }
+
+    function refreshPersonSelects(){
+      var ids=['offerPerson','gainGiver','gainReceiver','tradeGiver','tradeReceiver'],i,j,s,current,html;
+      for(i=0;i<ids.length;i++){
+        s=document.getElementById(ids[i]);current=s.value;html='<option value="">Moi / aucune personne</option>';
+        for(j=0;j<people.length;j++) html+='<option value="'+esc(people[j].id)+'">'+esc(people[j].name)+'</option>';
+        s.innerHTML=html;
+        if(findById(people,current)) s.value=current;
+      }
+      var filter=document.getElementById('directoryPersonFilter'),cur=filter.value;
+      html='<option value="">Toutes les personnes</option>';
+      for(i=0;i<people.length;i++) html+='<option value="'+esc(people[i].id)+'">'+esc(people[i].name)+'</option>';
+      filter.innerHTML=html;if(findById(people,cur)) filter.value=cur;
+    }
+
+    function refreshProductSelect(){
+      var ids=['gainProduct','tradeProduct'],i,j,s,current,html;
+      for(i=0;i<ids.length;i++){
+        s=document.getElementById(ids[i]);current=s.value;html='<option value="">Aucun produit</option>';
+        for(j=0;j<offers.length;j++) html+='<option value="'+esc(offers[j].id)+'">'+esc(offers[j].name)+'</option>';
+        s.innerHTML=html;if(findById(offers,current)) s.value=current;
+      }
+      var filter=document.getElementById('directoryProductFilter'),cur=filter.value;
+      html='<option value="">Tous les produits</option>';
+      for(i=0;i<offers.length;i++) html+='<option value="'+esc(offers[i].id)+'">'+esc(offers[i].name)+'</option>';
+      filter.innerHTML=html;if(findById(offers,cur)) filter.value=cur;
+    }
+
+    function displayPeople(){
+      var el=document.getElementById('peopleList'),html='',i,p;
+      if(!people.length){el.innerHTML='<div class="empty">Aucune personne enregistrée.</div>';return;}
+      for(i=0;i<people.length;i++){
+        p=people[i];
+        html+='<div class="item"><div class="item-top"><strong>'+esc(p.name)+'</strong><button class="secondary" type="button" onclick="deletePerson(\''+esc(p.id)+'\')">Supprimer</button></div></div>';
+      }
+      el.innerHTML=html;
+    }
+    function addPerson(){
+      var name=document.getElementById('personName').value.trim();if(!name)return;
+      people.push({id:makeId(),name:name});save(STORAGE.people,people);document.getElementById('personName').value='';refreshPersonSelects();displayPeople();displayDirectory();
+    }
+    function deletePerson(id){ people=people.filter(function(p){return p.id!==id;});save(STORAGE.people,people);refreshPersonSelects();displayPeople();displayDirectory(); }
+
+    function addOffer(){
+      var name=document.getElementById('offerName').value.trim();if(!name)return alert('Donne un nom à l’offre ou au produit.');
+      offers.push({id:makeId(),name:name,person:document.getElementById('offerPerson').value,amount:number('offerAmount'),charge:Math.max(0,number('offerCharge')),date:document.getElementById('offerDate').value||nowInput()});
+      save(STORAGE.offers,offers);refreshProductSelect();displayOffers();displayDirectory();
+    }
+    function displayOffers(){
+      var el=document.getElementById('offersList'),html='',i,o;
+      if(!offers.length){el.innerHTML='<div class="empty">Aucune offre enregistrée.</div>';return;}
+      for(i=0;i<offers.length;i++){
+        o=offers[i];
+        html+='<div class="item"><div class="item-top"><strong>'+esc(o.name)+'</strong><button class="secondary" type="button" onclick="deleteOffer(\''+esc(o.id)+'\')">Supprimer</button></div><div class="small">Personne : '+esc(personName(o.person))+' | Offre : '+money(o.amount)+' | Charge : '+money(o.charge)+' | '+esc(fmtDate(o.date))+'</div></div>';
+      }
+      el.innerHTML=html;
+    }
+    function deleteOffer(id){offers=offers.filter(function(o){return o.id!==id;});save(STORAGE.offers,offers);refreshProductSelect();displayOffers();displayDirectory();}
+
+    function addGain(){
+      var amount=number('gainAmount');
+      var name=document.getElementById('gainName').value.trim()||'Opération';
+      gains.push({id:makeId(),name:name,date:document.getElementById('gainDate').value||nowInput(),amount:amount,giver:document.getElementById('gainGiver').value,receiver:document.getElementById('gainReceiver').value,product:document.getElementById('gainProduct').value,source:'manuel'});
+      save(STORAGE.gains,gains);displayHistory();drawTimeChart();
+    }
+    function deleteGain(id){gains=gains.filter(function(g){return g.id!==id;});save(STORAGE.gains,gains);displayHistory();drawTimeChart();}
+    function displayHistory(){
+      var el=document.getElementById('historyList'),sorted=gains.slice().sort(function(a,b){return new Date(a.date)-new Date(b.date);}),html='',i,g;
+      if(!sorted.length){el.innerHTML='<div class="empty">Aucun gain ou perte enregistré.</div>';return;}
+      for(i=0;i<sorted.length;i++){
+        g=sorted[i];
+        html+='<div class="item"><div class="item-top"><strong><span class="dot">'+(g.amount>=0?'🟢':'🔴')+'</span> '+esc(g.name)+'</strong><button class="secondary" type="button" onclick="deleteGain(\''+esc(g.id)+'\')">Supprimer</button></div><div class="small">'+esc(fmtDate(g.date))+' | Variation : <span class="'+(g.amount>=0?'positive':'negative')+'">'+(g.amount>=0?'+':'')+money(g.amount)+'</span> | Donne : '+esc(personName(g.giver))+' | Reçoit : '+esc(personName(g.receiver))+' | Produit : '+esc(productName(g.product))+'</div></div>';
+      }
+      el.innerHTML=html;
+    }
+
+    function drawTimeChart(){
+      var c=document.getElementById('timeChart'),rect=c.getBoundingClientRect(),d=window.devicePixelRatio||1,w=Math.max(320,rect.width),h=340;
+      c.width=w*d;c.height=h*d;var ctx=c.getContext('2d');ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,w,h);
+      var data=gains.slice().sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+      if(!data.length){ctx.fillStyle='#667085';ctx.font='15px Arial';ctx.textAlign='center';ctx.fillText('Ajoute un gain ou une perte pour afficher la courbe.',w/2,h/2);c._chartPoints=[];return;}
+      var cumulative=0,points=[],i,g;
+      for(i=0;i<data.length;i++){g=data[i];cumulative+=Number(g.amount)||0;var copy={};var k;for(k in g){if(g.hasOwnProperty(k))copy[k]=g[k];}copy.total=cumulative;points.push(copy);}
+      var vals=[0],min,max;for(i=0;i<points.length;i++)vals.push(points[i].total);min=vals[0];max=vals[0];for(i=1;i<vals.length;i++){if(vals[i]<min)min=vals[i];if(vals[i]>max)max=vals[i];}if(min===max){min-=1;max+=1;}
+      var left=55,right=20,top=25,bottom=50,pw=w-left-right,ph=h-top-bottom;
+      function pointX(index){return points.length===1?left+pw/2:left+index*(pw/(points.length-1));}
+      function pointY(value){return top+(max-value)/(max-min)*ph;}
+      ctx.strokeStyle='#cfd5dd';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(left,top);ctx.lineTo(left,h-bottom);ctx.lineTo(w-right,h-bottom);ctx.stroke();
+      ctx.font='12px Arial';ctx.fillStyle='#667085';ctx.textAlign='right';ctx.fillText(max.toLocaleString('fr-FR'),left-7,top+4);ctx.fillText(min.toLocaleString('fr-FR'),left-7,h-bottom);ctx.textAlign='center';ctx.fillText('Temps',w/2,h-15);
+      for(i=1;i<points.length;i++){
+        var prev=points[i-1],cur=points[i];ctx.strokeStyle=cur.amount>=0?'#087443':'#b42318';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(pointX(i-1),pointY(prev.total));ctx.lineTo(pointX(i),pointY(cur.total));ctx.stroke();
+      }
+      for(i=0;i<points.length;i++){ctx.fillStyle=points[i].amount>=0?'#087443':'#b42318';ctx.beginPath();ctx.arc(pointX(i),pointY(points[i].total),5,0,Math.PI*2);ctx.fill();}
+      c._chartPoints=[];for(i=0;i<points.length;i++)c._chartPoints.push({x:pointX(i),y:pointY(points[i].total),data:points[i]});
+    }
+
+    function createTrade(addToGraph){
+      var product=document.getElementById('tradeProduct').value,giver=document.getElementById('tradeGiver').value,receiver=document.getElementById('tradeReceiver').value,offer=number('tradeOffer'),resale=number('tradeResale'),charge=Math.max(0,number('tradeCharge')),profit=resale-offer-charge;
+      var trade={id:makeId(),date:nowInput(),demand:Math.max(0,number('tradeDemand')),offer:offer,resale:resale,charge:charge,profit:profit,giver:giver,receiver:receiver,product:product,addedToGraph:addToGraph};trades.push(trade);save(STORAGE.trades,trades);
+      if(addToGraph){gains.push({id:makeId(),name:productName(product)==='Aucun produit'?'Opération simulée':productName(product),date:trade.date,amount:profit,giver:giver,receiver:receiver,product:product,source:'simulation',tradeId:trade.id});save(STORAGE.gains,gains);displayHistory();drawTimeChart();}
+      displayTrades();displayDirectory();document.getElementById('tradeProfit').textContent=money(profit);
+    }
+    function calculateTrade(){var profit=number('tradeResale')-number('tradeOffer')-Math.max(0,number('tradeCharge'));document.getElementById('tradeProfit').textContent=(profit>=0?'+':'')+money(profit);}
+    function deleteTrade(id){trades=trades.filter(function(t){return t.id!==id;});gains=gains.filter(function(g){return g.tradeId!==id;});save(STORAGE.trades,trades);save(STORAGE.gains,gains);displayTrades();displayHistory();displayDirectory();drawTimeChart();}
+    function displayTrades(){
+      var el=document.getElementById('tradesList'),html='',i,t;
+      if(!trades.length){el.innerHTML='<div class="empty">Aucune simulation enregistrée.</div>';return;}
+      for(i=trades.length-1;i>=0;i--){t=trades[i];html+='<div class="item"><div class="item-top"><strong>'+esc(productName(t.product))+'</strong><button class="secondary" type="button" onclick="deleteTrade(\''+esc(t.id)+'\')">Supprimer</button></div><div class="small">Demande : '+t.demand+' | Offre : '+money(t.offer)+' | Revente : '+money(t.resale)+' | Charge : '+money(t.charge)+' | Bénéfice : <span class="'+(t.profit>=0?'positive':'negative')+'">'+(t.profit>=0?'+':'')+money(t.profit)+'</span> | Donne : '+esc(personName(t.giver))+' | Reçoit : '+esc(personName(t.receiver))+'</div></div>';}
+      el.innerHTML=html;
+    }
+
+    function displayDirectory(){
+      var pf=document.getElementById('directoryPersonFilter').value,of=document.getElementById('directoryProductFilter').value,rows=[],i,t,el,html='';
+      for(i=0;i<trades.length;i++){t=trades[i];if((!pf||t.giver===pf||t.receiver===pf)&&(!of||t.product===of))rows.push(t);}
+      el=document.getElementById('directory');if(!rows.length){el.innerHTML='<div class="empty">Aucune interaction correspondant aux filtres.</div>';return;}
+      html='<div class="table-wrap"><table><thead><tr><th>Date</th><th>Donne</th><th>Reçoit</th><th>Produit</th><th>Demande</th><th>Offre</th><th>Revente</th><th>Charge</th><th>Bénéfice</th></tr></thead><tbody>';
+      for(i=0;i<rows.length;i++){t=rows[i];html+='<tr><td>'+esc(fmtDate(t.date))+'</td><td>'+esc(personName(t.giver))+'</td><td>'+esc(personName(t.receiver))+'</td><td>'+esc(productName(t.product))+'</td><td>'+t.demand+'</td><td>'+money(t.offer)+'</td><td>'+money(t.resale)+'</td><td>'+money(t.charge)+'</td><td class="'+(t.profit>=0?'positive':'negative')+'">'+(t.profit>=0?'+':'')+money(t.profit)+'</td></tr>';}
+      html+='</tbody></table></div>';el.innerHTML=html;
+    }
+
+    function populateCurrencies(query){
+      query=query||'';var q=query.trim().toLowerCase(),recent=[],all=[],matches=[],i,j,code,found;
+      for(i=0;i<recentCurrencies.length;i++){
+        code=recentCurrencies[i];found=null;
+        for(j=0;j<CURRENCIES.length;j++){if(CURRENCIES[j][0]===code){found=CURRENCIES[j];break;}}
+        if(found){var already=false,k;for(k=0;k<recent.length;k++){if(recent[k][0]===found[0])already=true;}if(!already)recent.push(found);}
+      }
+      for(i=0;i<CURRENCIES.length;i++){if(!hasCode(recentCurrencies,CURRENCIES[i][0]))all.push(CURRENCIES[i]);}
+      matches=recent.concat(all).filter(function(x){return !q||x[0].toLowerCase().indexOf(q)!==-1||x[1].toLowerCase().indexOf(q)!==-1;});
+      var box=document.getElementById('currencyResults'),html='';for(i=0;i<Math.min(80,matches.length);i++)html+='<div class="currency-option" data-code="'+matches[i][0]+'"><strong>'+matches[i][0]+'</strong> — '+matches[i][1]+'</div>';
+      box.innerHTML=html;box.hidden=!matches.length;
+      var options=box.querySelectorAll('.currency-option');for(i=0;i<options.length;i++)options[i].addEventListener('click',function(){selectCurrency(this.getAttribute('data-code'));});
+    }
+    function selectCurrency(code){
+      selectedCurrency=code;localStorage.setItem(STORAGE.currency,code);recentCurrencies=[code];
+      var old=load(STORAGE.recent,[]),i;for(i=0;i<old.length;i++){if(old[i]!==code&&recentCurrencies.length<8)recentCurrencies.push(old[i]);}
+      save(STORAGE.recent,recentCurrencies);document.getElementById('currencySearch').value=code;document.getElementById('selectedCurrencyText').textContent='Devise sélectionnée : '+code;document.getElementById('currencyResults').hidden=true;updateFinance();displayOffers();displayTrades();displayDirectory();drawTimeChart();
+    }
+
+    function resetAll(){
+      if(!confirm('Supprimer toutes les données enregistrées dans ce tableau de bord ?'))return;
+      var k;for(k in STORAGE){if(STORAGE.hasOwnProperty(k))localStorage.removeItem(STORAGE[k]);}
+      location.reload();
+    }
+
+    function showDefinition(info){
+      var tip=document.getElementById('tip');
+      tip.textContent=info.getAttribute('data-definition') || '';
+      tip.style.display='block';
+      var r=info.getBoundingClientRect();
+      var left=r.left;
+      var top=r.bottom+8;
+      if(left+300>window.innerWidth)left=window.innerWidth-310;
+      if(left<10)left=10;
+      if(top+120>window.innerHeight)top=Math.max(10,r.top-120);
+      tip.style.left=left+'px';
+      tip.style.top=top+'px';
+    }
+
+    function setupDefinitions(){
+      var infos=document.querySelectorAll('.info'),i;
+      for(i=0;i<infos.length;i++){
+        infos[i].setAttribute('role','button');
+        infos[i].setAttribute('tabindex','0');
+        infos[i].addEventListener('click',function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          var tip=document.getElementById('tip');
+          if(tip.style.display==='block' && tip.getAttribute('data-open-for')===this.getAttribute('data-definition')){
+            tip.style.display='none';
+            tip.removeAttribute('data-open-for');
+          }else{
+            tip.setAttribute('data-open-for',this.getAttribute('data-definition') || '');
+            showDefinition(this);
+          }
+        });
+        infos[i].addEventListener('keydown',function(e){
+          if(e.key==='Enter' || e.key===' '){
+            e.preventDefault();
+            this.click();
+          }
+        });
+      }
+    }
+
+    document.addEventListener('click',function(e){
+      var tip=document.getElementById('tip');
+      var target=e.target;
+      var isInfo=target && target.closest ? target.closest('.info') : null;
+      var isTip=target && target.closest ? target.closest('#tip') : null;
+      if(!isInfo && !isTip){
+        tip.style.display='none';
+        tip.removeAttribute('data-open-for');
+      }
+      var inCurrency=target && target.closest ? target.closest('.relative') : null;
+      if(!inCurrency)document.getElementById('currencyResults').hidden=true;
+    });
+
+    document.getElementById('addPersonBtn').addEventListener('click',addPerson);
+    document.getElementById('addOfferBtn').addEventListener('click',addOffer);
+    document.getElementById('addGainBtn').addEventListener('click',addGain);
+    document.getElementById('saveTradeBtn').addEventListener('click',function(){createTrade(false);});
+    document.getElementById('saveTradeGraphBtn').addEventListener('click',function(){createTrade(true);});
+    document.getElementById('resetBtn').addEventListener('click',resetAll);
+    var financeIds=['ca','charges','objectif'],i;for(i=0;i<financeIds.length;i++)document.getElementById(financeIds[i]).addEventListener('input',updateFinance);
+    var tradeIds=['tradeDemand','tradeOffer','tradeResale','tradeCharge'];for(i=0;i<tradeIds.length;i++)document.getElementById(tradeIds[i]).addEventListener('input',calculateTrade);
+    document.getElementById('tradeProduct').addEventListener('change',function(){var o=findById(offers,document.getElementById('tradeProduct').value);if(o){document.getElementById('tradeOffer').value=o.amount;document.getElementById('tradeCharge').value=o.charge;if(o.person)document.getElementById('tradeGiver').value=o.person;calculateTrade();}});
+    document.getElementById('currencySearch').addEventListener('input',function(e){populateCurrencies(e.target.value);});
+    document.getElementById('currencySearch').addEventListener('focus',function(){populateCurrencies(document.getElementById('currencySearch').value);});
+    document.getElementById('directoryPersonFilter').addEventListener('change',displayDirectory);
+    document.getElementById('directoryProductFilter').addEventListener('change',displayDirectory);
+    document.getElementById('timeChart').addEventListener('mousemove',function(e){
+      var c=e.currentTarget,rect=c.getBoundingClientRect(),scaleX=c.width/rect.width,scaleY=c.height/rect.height;
+      var mx=(e.clientX-rect.left)*scaleX/(window.devicePixelRatio||1),my=(e.clientY-rect.top)*scaleY/(window.devicePixelRatio||1),pts=c._chartPoints||[],best=null,dist=Infinity,j;
+      for(j=0;j<pts.length;j++){var dx=pts[j].x-mx,dy=pts[j].y-my,dd=Math.sqrt(dx*dx+dy*dy);if(dd<dist){dist=dd;best=pts[j];}}
+      var tip=document.getElementById('tip');
+      if(best&&dist<18){var p=best.data;tip.innerHTML='<strong>'+esc(p.name)+'</strong><br>Variation : '+(p.amount>=0?'+':'')+money(p.amount)+'<br>Total cumulé : '+money(p.total)+'<br>Personne : '+esc(personName(p.person))+'<br>Produit : '+esc(productName(p.product))+'<br>Date : '+esc(fmtDate(p.date));tip.style.display='block';tip.style.left=Math.min(e.clientX+12,window.innerWidth-320)+'px';tip.style.top=Math.min(e.clientY+12,window.innerHeight-150)+'px';}else{tip.style.display='none';}
+    });
+    document.getElementById('timeChart').addEventListener('mouseleave',function(){document.getElementById('tip').style.display='none';});
+    window.addEventListener('resize',function(){updateFinance();drawTimeChart();});
+
+    (function(){
+      var finance=load(STORAGE.finance,null);
+      if(finance){document.getElementById('ca').value=finance.ca == null ? 15000 : finance.ca;document.getElementById('charges').value=finance.charges == null ? 9000 : finance.charges;document.getElementById('objectif').value=finance.objectif == null ? 18000 : finance.objectif;}
+      document.getElementById('currencySearch').value=selectedCurrency;document.getElementById('selectedCurrencyText').textContent='Devise sélectionnée : '+selectedCurrency;
+      document.getElementById('gainDate').value=nowInput();document.getElementById('offerDate').value=nowInput();
+      normalizeRecords();refreshPersonSelects();refreshProductSelect();displayPeople();displayOffers();displayHistory();displayTrades();displayDirectory();updateFinance();calculateTrade();drawTimeChart();setupDefinitions();
+    }());
+  </script>
+</body>
+</html>
