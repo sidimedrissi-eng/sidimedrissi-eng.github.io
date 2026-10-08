@@ -79,6 +79,8 @@
     @media(max-width:800px){.metrics{grid-template-columns:repeat(2,1fr)}.row3{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}
     @media(max-width:520px){.app{padding:14px}.metrics{grid-template-columns:1fr}.row{grid-template-columns:1fr}.card{padding:15px}}
   </style>
+  <!-- Chargement de Chart.js pour le graphique -->
+  <script src="https://jsdelivr.net"></script>
 </head>
 <body>
   <div class="app">
@@ -151,5 +153,30 @@
       <div id="offersList" class="directory"></div>
     </section>
   </div>
-</body>
-</html>
+
+  <script>
+    // Liste des principales devises mondiales
+    const currencies = [
+      { code: 'EUR', name: 'Euro' },
+      { code: 'MAD', name: 'Dirham Marocain' },
+      { code: 'USD', name: 'Dollar Américain' },
+      { code: 'CAD', name: 'Dollar Canadien' },
+      { code: 'CHF', name: 'Franc Suisse' },
+      { code: 'GBP', name: 'Livre Sterling' },
+      { code: 'DZD', name: 'Dinar Algérien' },
+      { code: 'TND', name: 'Dinar Tunisien' }
+    ];
+
+    let currentCurrency = 'EUR';
+    let chartInstance = null;
+
+    // Éléments du DOM
+    const caInput = document.getElementById('ca');
+    const chargesInput = document.getElementById('charges');
+    const objectifInput = document.getElementById('objectif');
+    const currencySearch = document.getElementById('currencySearch');
+    const currencyResults = document.getElementById('currencyResults');
+    const selectedCurrencyText = document.getElementById('selectedCurrencyText');
+
+    // Sauvegarde & Restauration Locale
+    function loadSavedData() {
