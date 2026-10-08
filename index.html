@@ -48,29 +48,25 @@
     @media(max-width:800px){.metrics{grid-template-columns:repeat(2,1fr)}.row3{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}
     @media(max-width:520px){.app{padding:14px}.metrics{grid-template-columns:1fr}.row{grid-template-columns:1fr}.card{padding:15px}}
 
-    .section-nav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
-    .section-nav a{background:#fff;color:#17202a;text-decoration:none;padding:9px 12px;border-radius:10px;border:1px solid #eaecf0;font-weight:700;font-size:14px}
-    .section-nav a:hover{background:#f2f4f7}
-    .summary-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
-    .summary-box{background:#f8fafc;border:1px solid #eaecf0;border-radius:12px;padding:13px}
+    .quick-nav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+    .quick-nav a{display:inline-block;padding:9px 12px;border-radius:10px;background:#e9edf2;color:#17202a;text-decoration:none;font-weight:700}
+    .quick-nav a:hover{background:#dce3eb}
+    .extra-section{scroll-margin-top:20px}
+    .summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .summary-box{background:#f8f9fb;border:1px solid #eaecf0;border-radius:12px;padding:14px}
     .summary-box span{display:block;color:#667085;font-size:13px}
-    .summary-box strong{display:block;font-size:19px;margin-top:6px}
-    .progress-wrap{margin-top:14px}
-    .progress-track{height:14px;background:#eaecf0;border-radius:999px;overflow:hidden}
-    .progress-fill{height:100%;width:0;background:#315b9b;transition:width .25s ease}
-    .calc-result{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
-    .calc-result .summary-box{background:#fff}
-    .period-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-    .period-buttons button.active{background:#315b9b;color:#fff}
-    .learning-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    .learning-card{border:1px solid #eaecf0;border-radius:12px;padding:15px;background:#fafbfc}
-    .learning-card h3{margin-bottom:7px;font-size:17px}
-    .learning-card p{margin:6px 0;color:#475467;line-height:1.5}
-    .about-note{line-height:1.6;color:#475467}
-    .notice{padding:12px;border-radius:10px;background:#f5f8fc;border-left:4px solid #315b9b;color:#475467}
-    @media(max-width:1050px){.summary-grid{grid-template-columns:repeat(3,1fr)}}
-    @media(max-width:800px){.calc-result{grid-template-columns:repeat(2,1fr)}.learning-grid{grid-template-columns:1fr}}
-    @media(max-width:520px){.summary-grid{grid-template-columns:1fr 1fr}.calc-result{grid-template-columns:1fr}}
+    .summary-box strong{display:block;font-size:20px;margin-top:7px}
+    .summary-goal{margin-top:14px}
+    .progress{height:14px;background:#eaecf0;border-radius:999px;overflow:hidden;margin-top:8px}
+    .progress>div{height:100%;width:0;background:#315b9b;transition:width .2s}
+    .calculator-results{margin-top:16px}
+    .analysis-periods{margin-top:0;margin-bottom:14px}
+    .period-btn.active{background:#17202a;color:#fff}
+    .learn-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .guide-list{line-height:1.8;margin-bottom:0}
+    @media(max-width:800px){.summary-grid{grid-template-columns:repeat(2,1fr)}.learn-grid{grid-template-columns:1fr}}
+    @media(max-width:520px){.summary-grid{grid-template-columns:1fr}}
+
   </style>
 </head>
 <body>
@@ -83,8 +79,7 @@
       <button class="danger" type="button" id="resetBtn">Réinitialiser les données</button>
     </header>
 
-
-    <nav class="section-nav" aria-label="Navigation du tableau de bord">
+    <nav class="quick-nav">
       <a href="#resume">Résumé</a>
       <a href="#calculatrice">Calculatrice</a>
       <a href="#analyses">Analyses</a>
@@ -93,21 +88,90 @@
       <a href="#apropos">À propos</a>
     </nav>
 
-    <section class="card" id="resume">
+
+    <section class="card extra-section" id="resume">
       <h2>Résumé général</h2>
       <div class="summary-grid">
         <div class="summary-box"><span>CA</span><strong id="summaryCA">0 EUR</strong></div>
         <div class="summary-box"><span>Charges</span><strong id="summaryCharges">0 EUR</strong></div>
         <div class="summary-box"><span>Bénéfice</span><strong id="summaryProfit">0 EUR</strong></div>
-        <div class="summary-box"><span>Gains / pertes</span><strong id="summaryVariation">0 EUR</strong></div>
+        <div class="summary-box"><span>Gains / pertes</span><strong id="summaryGains">0 EUR</strong></div>
         <div class="summary-box"><span>Personnes</span><strong id="summaryPeople">0</strong></div>
         <div class="summary-box"><span>Produits</span><strong id="summaryProducts">0</strong></div>
       </div>
-      <div class="progress-wrap">
-        <strong>Progression vers l’objectif</strong>
-        <div class="progress-track"><div id="objectiveProgress" class="progress-fill"></div></div>
-        <div class="small" id="objectiveProgressText" style="margin-top:6px">0 % de l’objectif</div>
+      <div class="summary-goal">
+        <div class="item-top"><strong>Progression vers l’objectif</strong><span id="summaryGoalText">0 %</span></div>
+        <div class="progress"><div id="summaryGoalBar"></div></div>
       </div>
+    </section>
+
+    <section class="card extra-section" id="calculatrice">
+      <h2>Calculatrice de bénéfice et de marge <span class="info" data-definition="Cette calculatrice permet de simuler le coût total, le chiffre d’affaires, le bénéfice et la marge à partir d’un prix d’achat, d’un prix de vente et d’une quantité.">?</span></h2>
+      <div class="row3">
+        <div><label for="calcBuy">Prix d’achat unitaire</label><input id="calcBuy" type="number" step="0.01" min="0" value="0"></div>
+        <div><label for="calcSell">Prix de vente unitaire</label><input id="calcSell" type="number" step="0.01" min="0" value="0"></div>
+        <div><label for="calcQty">Quantité</label><input id="calcQty" type="number" step="1" min="0" value="1"></div>
+      </div>
+      <div class="summary-grid calculator-results">
+        <div class="summary-box"><span>Coût total</span><strong id="calcCost">0 EUR</strong></div>
+        <div class="summary-box"><span>Chiffre d’affaires</span><strong id="calcRevenue">0 EUR</strong></div>
+        <div class="summary-box"><span>Bénéfice</span><strong id="calcProfit">0 EUR</strong></div>
+        <div class="summary-box"><span>Marge</span><strong id="calcMargin">0 %</strong></div>
+      </div>
+    </section>
+
+    <section class="card extra-section" id="analyses">
+      <h2>Analyses</h2>
+      <div class="actions analysis-periods">
+        <button type="button" class="secondary period-btn" data-period="all">Tout</button>
+        <button type="button" class="secondary period-btn" data-period="today">Aujourd’hui</button>
+        <button type="button" class="secondary period-btn" data-period="7">7 jours</button>
+        <button type="button" class="secondary period-btn" data-period="30">30 jours</button>
+        <button type="button" class="secondary period-btn" data-period="365">1 an</button>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-box"><span>Variations positives</span><strong id="analysisPositive">0 EUR</strong></div>
+        <div class="summary-box"><span>Variations négatives</span><strong id="analysisNegative">0 EUR</strong></div>
+        <div class="summary-box"><span>Résultat net</span><strong id="analysisNet">0 EUR</strong></div>
+        <div class="summary-box"><span>Nombre d’opérations</span><strong id="analysisCount">0</strong></div>
+        <div class="summary-box"><span>Meilleur gain</span><strong id="analysisBest">0 EUR</strong></div>
+        <div class="summary-box"><span>Plus grosse perte</span><strong id="analysisWorst">0 EUR</strong></div>
+      </div>
+      <div class="item">
+        <strong>Produits les plus présents</strong>
+        <div id="analysisProducts" class="small" style="margin-top:8px">Aucune donnée.</div>
+      </div>
+    </section>
+
+    <section class="card extra-section" id="apprendre">
+      <h2>Apprendre</h2>
+      <div class="learn-grid">
+        <div class="item"><strong>Chiffre d’affaires</strong><p>Le CA représente le total des ventes avant les charges.</p></div>
+        <div class="item"><strong>Bénéfice</strong><p>Le bénéfice correspond au CA auquel on retire les charges.</p></div>
+        <div class="item"><strong>Marge</strong><p>La marge indique la part du CA qui reste après les charges, en pourcentage.</p></div>
+        <div class="item"><strong>Gain et perte</strong><p>Un gain augmente le total cumulé et une perte le diminue.</p></div>
+        <div class="item"><strong>Objectif</strong><p>L’objectif permet de comparer le CA réalisé au montant que tu souhaites atteindre.</p></div>
+        <div class="item"><strong>Simulation</strong><p>Une simulation permet de tester des chiffres sans réaliser d’achat ou de vente réelle.</p></div>
+      </div>
+    </section>
+
+    <section class="card extra-section" id="guide">
+      <h2>Guide d’utilisation</h2>
+      <ol class="guide-list">
+        <li>Choisis ta devise et renseigne le CA, les charges et l’objectif.</li>
+        <li>Consulte les résultats et le graphique de comparaison.</li>
+        <li>Ajoute tes personnes et tes produits pour pouvoir les réutiliser.</li>
+        <li>Enregistre tes gains et pertes : un montant négatif représente une diminution.</li>
+        <li>Utilise la simulation pour tester une opération et calculer son bénéfice.</li>
+        <li>Consulte le répertoire pour retrouver les interactions enregistrées.</li>
+        <li>Utilise la calculatrice si tu veux simplement tester une opération sans l’enregistrer.</li>
+      </ol>
+    </section>
+
+    <section class="card extra-section" id="apropos">
+      <h2>À propos</h2>
+      <p>Ce tableau de bord est un outil éducatif de calcul, de suivi et de simulation. Les données saisies sont conservées dans le navigateur utilisé pour le site.</p>
+      <p class="small">Les simulations ne garantissent aucun résultat réel et ne constituent pas un conseil financier.</p>
     </section>
 
     <section class="card">
@@ -144,45 +208,6 @@
     <section class="card">
       <h2>Comparaison financière <span class="info" data-definition="Ce graphique compare le chiffre d’affaires, les charges, le bénéfice et l’objectif.">?</span></h2>
       <canvas id="chart"></canvas>
-    </section>
-
-
-    <section class="card" id="calculatrice">
-      <h2>Calculatrice de bénéfice et de marge</h2>
-      <div class="small" style="margin-bottom:12px">Cette calculatrice sert à comprendre une opération. Elle ne réalise aucune transaction.</div>
-      <div class="row3">
-        <div><label for="calcPurchase">Prix d’achat</label><input id="calcPurchase" type="number" step="0.01" min="0" value="20"></div>
-        <div><label for="calcSale">Prix de vente</label><input id="calcSale" type="number" step="0.01" min="0" value="30"></div>
-        <div><label for="calcQuantity">Quantité</label><input id="calcQuantity" type="number" step="1" min="0" value="1"></div>
-      </div>
-      <div class="calc-result">
-        <div class="summary-box"><span>Coût total</span><strong id="calcCost">0 EUR</strong></div>
-        <div class="summary-box"><span>Chiffre d’affaires</span><strong id="calcRevenue">0 EUR</strong></div>
-        <div class="summary-box"><span>Bénéfice</span><strong id="calcProfit">0 EUR</strong></div>
-        <div class="summary-box"><span>Marge</span><strong id="calcMargin">0 %</strong></div>
-      </div>
-    </section>
-
-
-    <section class="card" id="analyses">
-      <h2>Analyses</h2>
-      <div class="period-buttons">
-        <button type="button" class="secondary active" data-period="all">Tout</button>
-        <button type="button" class="secondary" data-period="day">Aujourd’hui</button>
-        <button type="button" class="secondary" data-period="7">7 jours</button>
-        <button type="button" class="secondary" data-period="30">30 jours</button>
-        <button type="button" class="secondary" data-period="365">1 an</button>
-      </div>
-      <div class="summary-grid">
-        <div class="summary-box"><span>Variations positives</span><strong id="analysisGains">0 EUR</strong></div>
-        <div class="summary-box"><span>Variations négatives</span><strong id="analysisLosses">0 EUR</strong></div>
-        <div class="summary-box"><span>Solde de la période</span><strong id="analysisNet">0 EUR</strong></div>
-        <div class="summary-box"><span>Nombre d’opérations</span><strong id="analysisCount">0</strong></div>
-        <div class="summary-box"><span>Meilleur gain</span><strong id="analysisBest">0 EUR</strong></div>
-        <div class="summary-box"><span>Plus grosse perte</span><strong id="analysisWorst">0 EUR</strong></div>
-      </div>
-      <h3 style="margin-top:18px">Produits les plus rentables</h3>
-      <div id="topProducts" class="learning-grid"></div>
     </section>
 
     <section class="card">
@@ -263,56 +288,6 @@
       </div>
       <div id="directory" class="directory"></div>
     </section>
-
-    <section class="card" id="apprendre">
-      <h2>Apprendre</h2>
-      <div class="learning-grid">
-        <div class="learning-card">
-          <h3>CA et bénéfice</h3>
-          <p>Le chiffre d’affaires représente les ventes. Le bénéfice simplifié du dashboard est calculé en retirant les charges du CA.</p>
-          <p><strong>Exemple :</strong> 1 000 EUR de CA − 600 EUR de charges = 400 EUR de bénéfice.</p>
-        </div>
-        <div class="learning-card">
-          <h3>Marge bénéficiaire</h3>
-          <p>La marge bénéficiaire indique quelle part du CA reste après les charges.</p>
-          <p><strong>Formule :</strong> bénéfice ÷ CA × 100.</p>
-        </div>
-        <div class="learning-card">
-          <h3>Gain et perte</h3>
-          <p>Dans le graphique d’évolution, un montant positif augmente le cumul et un montant négatif le diminue.</p>
-        </div>
-        <div class="learning-card">
-          <h3>Objectif</h3>
-          <p>Un objectif permet de comparer un montant visé avec le CA actuel. Le tableau de bord affiche aussi l’écart et la progression.</p>
-        </div>
-        <div class="learning-card">
-          <h3>Simulation</h3>
-          <p>Une simulation permet de tester une hypothèse sans effectuer d’achat ou de vente réelle. Le résultat dépend des montants saisis.</p>
-        </div>
-        <div class="learning-card">
-          <h3>Attention aux calculs</h3>
-          <p>Un bénéfice simulé n’est pas une garantie de résultat réel. Les frais, taxes, retours et autres éléments peuvent modifier une situation réelle.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="card" id="guide">
-      <h2>Guide d’utilisation</h2>
-      <div class="notice">
-        <strong>1.</strong> Choisis ta devise et renseigne ton CA, tes charges et ton objectif.<br>
-        <strong>2.</strong> Ajoute les personnes et les produits dont tu veux garder la trace.<br>
-        <strong>3.</strong> Enregistre tes gains et pertes pour alimenter le graphique d’évolution.<br>
-        <strong>4.</strong> Utilise la simulation pour tester une opération fictive.<br>
-        <strong>5.</strong> Consulte les analyses pour repérer les tendances et les produits les plus rentables.
-      </div>
-    </section>
-
-    <section class="card" id="apropos">
-      <h2>À propos de ce dashboard</h2>
-      <p class="about-note">Mon Dashboard Financier est un outil éducatif de calcul, de suivi et de simulation. Il permet d’organiser des données comme le chiffre d’affaires, les charges, les objectifs, les gains, les pertes, les personnes et les produits.</p>
-      <p class="about-note">Les calculs présentés sont des simulations et ne constituent pas un service bancaire ni un conseil financier. Les données saisies dans ce navigateur sont enregistrées localement sur cet appareil.</p>
-    </section>
-
   </div>
 
   <div id="tip" class="tip"></div>
@@ -390,9 +365,7 @@
       document.getElementById('resultEcart').textContent=(ecart>=0?'+':'')+money(ecart);
       save(STORAGE.finance,{ca:ca,charges:charges,objectif:objectif});
       drawBar([ca,charges,Math.max(0,benefice),objectif],['CA','Charges','Bénéfice','Objectif']);
-      updateNewSummary();
-      updateCalculator();
-      updateAnalyses();
+      updateExtraSections();
     }
 
     function drawBar(values,labels){
@@ -413,6 +386,77 @@
         ctx.fillStyle='#17202a';ctx.fillText(labels[i],x+bw/2,base+25);ctx.fillText(Number(v).toLocaleString('fr-FR'),x+bw/2,Math.max(18,y-8));
       }
       ctx.strokeStyle='#cfd5dd';ctx.beginPath();ctx.moveTo(pad,base);ctx.lineTo(w-pad,base);ctx.stroke();
+    }
+
+
+    function updateExtraSections(){
+      var finance=load(STORAGE.finance,{ca:0,charges:0,objectif:0});
+      var ca=Number(finance.ca)||0, charges=Number(finance.charges)||0, objectif=Number(finance.objectif)||0;
+      var profit=ca-charges, gainTotal=0, i;
+      for(i=0;i<gains.length;i++) gainTotal += Number(gains[i].amount)||0;
+      document.getElementById('summaryCA').textContent=money(ca);
+      document.getElementById('summaryCharges').textContent=money(charges);
+      document.getElementById('summaryProfit').textContent=money(profit);
+      document.getElementById('summaryGains').textContent=(gainTotal>=0?'+':'')+money(gainTotal);
+      document.getElementById('summaryPeople').textContent=people.length;
+      document.getElementById('summaryProducts').textContent=offers.length;
+      var goalPct=objectif>0 ? Math.max(0,Math.min(100,ca/objectif*100)) : 0;
+      document.getElementById('summaryGoalText').textContent=goalPct.toFixed(0)+' %';
+      document.getElementById('summaryGoalBar').style.width=goalPct+'%';
+      updateCalculator();
+      updateAnalyses();
+    }
+
+    function updateCalculator(){
+      var buy=Number(document.getElementById('calcBuy').value)||0;
+      var sell=Number(document.getElementById('calcSell').value)||0;
+      var qty=Math.max(0,Number(document.getElementById('calcQty').value)||0);
+      var cost=buy*qty, revenue=sell*qty, profit=revenue-cost, margin=revenue ? profit/revenue*100 : 0;
+      document.getElementById('calcCost').textContent=money(cost);
+      document.getElementById('calcRevenue').textContent=money(revenue);
+      document.getElementById('calcProfit').textContent=(profit>=0?'+':'')+money(profit);
+      document.getElementById('calcMargin').textContent=margin.toFixed(1)+' %';
+    }
+
+    var analysisPeriod='all';
+    function recordInPeriod(dateValue){
+      if(analysisPeriod==='all') return true;
+      var d=new Date(dateValue), now=new Date();
+      if(isNaN(d.getTime())) return false;
+      if(analysisPeriod==='today') return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth() && d.getDate()===now.getDate();
+      var days=Number(analysisPeriod)||0;
+      var limit=new Date(now.getTime()-days*24*60*60*1000);
+      return d>=limit;
+    }
+
+    function updateAnalyses(){
+      var list=[],i,g,positive=0,negative=0,best=null,worst=null,counts={};
+      for(i=0;i<gains.length;i++){
+        g=gains[i];
+        if(recordInPeriod(g.date)){
+          list.push(g);
+          var amount=Number(g.amount)||0;
+          if(amount>=0){positive+=amount;if(best===null||amount>best)best=amount;}
+          else{negative+=amount;if(worst===null||amount<worst)worst=amount;}
+          if(g.product){
+            var pn=productName(g.product);
+            if(!counts[pn])counts[pn]=0;
+            counts[pn]++;
+          }
+        }
+      }
+      document.getElementById('analysisPositive').textContent='+'+money(positive);
+      document.getElementById('analysisNegative').textContent=money(negative);
+      document.getElementById('analysisNet').textContent=(positive+negative>=0?'+':'')+money(positive+negative);
+      document.getElementById('analysisCount').textContent=list.length;
+      document.getElementById('analysisBest').textContent=best===null?'—':'+'+money(best);
+      document.getElementById('analysisWorst').textContent=worst===null?'—':money(worst);
+      var names=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];}),text='';
+      for(i=0;i<Math.min(5,names.length);i++){
+        if(i) text+=' • ';
+        text+=esc(names[i])+' ('+counts[names[i]]+')';
+      }
+      document.getElementById('analysisProducts').innerHTML=text||'Aucune donnée.';
     }
 
     function normalizeRecords(){
@@ -459,14 +503,14 @@
     }
     function addPerson(){
       var name=document.getElementById('personName').value.trim();if(!name)return;
-      people.push({id:makeId(),name:name});save(STORAGE.people,people);document.getElementById('personName').value='';refreshPersonSelects();displayPeople();displayDirectory();updateNewSummary();updateAnalyses();
+      people.push({id:makeId(),name:name});save(STORAGE.people,people);document.getElementById('personName').value='';refreshPersonSelects();displayPeople();displayDirectory();updateExtraSections();
     }
     function deletePerson(id){ people=people.filter(function(p){return p.id!==id;});save(STORAGE.people,people);refreshPersonSelects();displayPeople();displayDirectory(); }
 
     function addOffer(){
       var name=document.getElementById('offerName').value.trim();if(!name)return alert('Donne un nom à l’offre ou au produit.');
       offers.push({id:makeId(),name:name,person:document.getElementById('offerPerson').value,amount:number('offerAmount'),charge:Math.max(0,number('offerCharge')),date:document.getElementById('offerDate').value||nowInput()});
-      save(STORAGE.offers,offers);refreshProductSelect();displayOffers();displayDirectory();updateNewSummary();updateAnalyses();
+      save(STORAGE.offers,offers);refreshProductSelect();displayOffers();displayDirectory();updateExtraSections();
     }
     function displayOffers(){
       var el=document.getElementById('offersList'),html='',i,o;
@@ -483,9 +527,9 @@
       var amount=number('gainAmount');
       var name=document.getElementById('gainName').value.trim()||'Opération';
       gains.push({id:makeId(),name:name,date:document.getElementById('gainDate').value||nowInput(),amount:amount,giver:document.getElementById('gainGiver').value,receiver:document.getElementById('gainReceiver').value,product:document.getElementById('gainProduct').value,source:'manuel'});
-      save(STORAGE.gains,gains);displayHistory();drawTimeChart();updateNewSummary();updateAnalyses();
+      save(STORAGE.gains,gains);displayHistory();drawTimeChart();updateExtraSections();
     }
-    function deleteGain(id){gains=gains.filter(function(g){return g.id!==id;});save(STORAGE.gains,gains);displayHistory();drawTimeChart();}
+    function deleteGain(id){gains=gains.filter(function(g){return g.id!==id;});save(STORAGE.gains,gains);displayHistory();drawTimeChart();updateExtraSections();}
     function displayHistory(){
       var el=document.getElementById('historyList'),sorted=gains.slice().sort(function(a,b){return new Date(a.date)-new Date(b.date);}),html='',i,g;
       if(!sorted.length){el.innerHTML='<div class="empty">Aucun gain ou perte enregistré.</div>';return;}
@@ -559,94 +603,6 @@
       save(STORAGE.recent,recentCurrencies);document.getElementById('currencySearch').value=code;document.getElementById('selectedCurrencyText').textContent='Devise sélectionnée : '+code;document.getElementById('currencyResults').hidden=true;updateFinance();displayOffers();displayTrades();displayDirectory();drawTimeChart();
     }
 
-
-    var currentAnalysisPeriod = 'all';
-
-    function updateNewSummary(){
-      var ca=Math.max(0,number('ca'));
-      var charges=Math.max(0,number('charges'));
-      var benefice=ca-charges;
-      var objectif=Math.max(0,number('objectif'));
-      var totalVariation=0,i;
-      for(i=0;i<gains.length;i++) totalVariation+=Number(gains[i].amount)||0;
-
-      document.getElementById('summaryCA').textContent=money(ca);
-      document.getElementById('summaryCharges').textContent=money(charges);
-      document.getElementById('summaryProfit').textContent=(benefice>=0?'+':'')+money(benefice);
-      document.getElementById('summaryVariation').textContent=(totalVariation>=0?'+':'')+money(totalVariation);
-      document.getElementById('summaryPeople').textContent=people.length;
-      document.getElementById('summaryProducts').textContent=offers.length;
-
-      var progress=objectif>0 ? Math.max(0,Math.min(100,ca/objectif*100)) : 0;
-      document.getElementById('objectiveProgress').style.width=progress+'%';
-      document.getElementById('objectiveProgressText').textContent=progress.toFixed(1)+' % de l’objectif';
-    }
-
-    function updateCalculator(){
-      var purchase=Math.max(0,number('calcPurchase'));
-      var sale=Math.max(0,number('calcSale'));
-      var quantity=Math.max(0,number('calcQuantity'));
-      var cost=purchase*quantity;
-      var revenue=sale*quantity;
-      var profit=revenue-cost;
-      var margin=revenue ? profit/revenue*100 : 0;
-      document.getElementById('calcCost').textContent=money(cost);
-      document.getElementById('calcRevenue').textContent=money(revenue);
-      document.getElementById('calcProfit').textContent=(profit>=0?'+':'')+money(profit);
-      document.getElementById('calcMargin').textContent=margin.toFixed(1)+' %';
-    }
-
-    function dateIsInPeriod(dateValue,period){
-      if(period==='all') return true;
-      var d=new Date(dateValue);
-      if(isNaN(d.getTime())) return false;
-      var now=new Date();
-      if(period==='day'){
-        return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth() && d.getDate()===now.getDate();
-      }
-      var days=Number(period)||0;
-      return d.getTime()>=now.getTime()-days*24*60*60*1000;
-    }
-
-    function updateAnalyses(){
-      var list=[],i,g,gainTotal=0,lossTotal=0,net=0,best=0,worst=0;
-      for(i=0;i<gains.length;i++){
-        g=gains[i];
-        if(dateIsInPeriod(g.date,currentAnalysisPeriod)){
-          list.push(g);
-          var a=Number(g.amount)||0;
-          net+=a;
-          if(a>0){gainTotal+=a;if(!list.length||a>best)best=a;}
-          if(a<0){lossTotal+=a;if(!list.length||a<worst)worst=a;}
-        }
-      }
-      document.getElementById('analysisGains').textContent='+'+money(gainTotal);
-      document.getElementById('analysisLosses').textContent=money(lossTotal);
-      document.getElementById('analysisNet').textContent=(net>=0?'+':'')+money(net);
-      document.getElementById('analysisCount').textContent=list.length;
-      document.getElementById('analysisBest').textContent=(best>0?'+':'')+money(best);
-      document.getElementById('analysisWorst').textContent=money(worst);
-
-      var totals={},j,name;
-      for(i=0;i<list.length;i++){
-        g=list[i];
-        name=productName(g.product);
-        if(name==='Aucun produit') name='Sans produit';
-        if(!totals[name]) totals[name]=0;
-        totals[name]+=Number(g.amount)||0;
-      }
-      var arr=[],key;
-      for(key in totals){if(totals.hasOwnProperty(key))arr.push({name:key,total:totals[key]});}
-      arr.sort(function(a,b){return b.total-a.total;});
-      var top=document.getElementById('topProducts');
-      if(!arr.length){top.innerHTML='<div class="empty">Aucune donnée pour cette période.</div>';return;}
-      var html='';
-      for(i=0;i<Math.min(6,arr.length);i++){
-        html+='<div class="learning-card"><h3>'+(i+1)+'. '+esc(arr[i].name)+'</h3><p>Résultat cumulé : <strong class="'+(arr[i].total>=0?'positive':'negative')+'">'+(arr[i].total>=0?'+':'')+money(arr[i].total)+'</strong></p></div>';
-      }
-      top.innerHTML=html;
-    }
-
     function resetAll(){
       if(!confirm('Supprimer toutes les données enregistrées dans ce tableau de bord ?'))return;
       var k;for(k in STORAGE){if(STORAGE.hasOwnProperty(k))localStorage.removeItem(STORAGE[k]);}
@@ -711,20 +667,6 @@
     document.getElementById('addGainBtn').addEventListener('click',addGain);
     document.getElementById('saveTradeBtn').addEventListener('click',function(){createTrade(false);});
     document.getElementById('saveTradeGraphBtn').addEventListener('click',function(){createTrade(true);});
-
-    var calcIds=['calcPurchase','calcSale','calcQuantity'];
-    for(i=0;i<calcIds.length;i++)document.getElementById(calcIds[i]).addEventListener('input',updateCalculator);
-    var periodButtons=document.querySelectorAll('[data-period]');
-    for(i=0;i<periodButtons.length;i++){
-      periodButtons[i].addEventListener('click',function(){
-        var buttons=document.querySelectorAll('[data-period]'),j;
-        currentAnalysisPeriod=this.getAttribute('data-period');
-        for(j=0;j<buttons.length;j++)buttons[j].classList.remove('active');
-        this.classList.add('active');
-        updateAnalyses();
-      });
-    }
-
     document.getElementById('resetBtn').addEventListener('click',resetAll);
     var financeIds=['ca','charges','objectif'],i;for(i=0;i<financeIds.length;i++)document.getElementById(financeIds[i]).addEventListener('input',updateFinance);
     var tradeIds=['tradeDemand','tradeOffer','tradeResale','tradeCharge'];for(i=0;i<tradeIds.length;i++)document.getElementById(tradeIds[i]).addEventListener('input',calculateTrade);
@@ -733,12 +675,26 @@
     document.getElementById('currencySearch').addEventListener('focus',function(){populateCurrencies(document.getElementById('currencySearch').value);});
     document.getElementById('directoryPersonFilter').addEventListener('change',displayDirectory);
     document.getElementById('directoryProductFilter').addEventListener('change',displayDirectory);
+
+    var calcIds=['calcBuy','calcSell','calcQty'],ci;
+    for(ci=0;ci<calcIds.length;ci++) document.getElementById(calcIds[ci]).addEventListener('input',updateCalculator);
+    var periodButtons=document.querySelectorAll('.period-btn');
+    for(ci=0;ci<periodButtons.length;ci++){
+      periodButtons[ci].addEventListener('click',function(){
+        var all=document.querySelectorAll('.period-btn'),j;
+        analysisPeriod=this.getAttribute('data-period');
+        for(j=0;j<all.length;j++) all[j].classList.remove('active');
+        this.classList.add('active');
+        updateAnalyses();
+      });
+    }
+
     document.getElementById('timeChart').addEventListener('mousemove',function(e){
       var c=e.currentTarget,rect=c.getBoundingClientRect(),scaleX=c.width/rect.width,scaleY=c.height/rect.height;
       var mx=(e.clientX-rect.left)*scaleX/(window.devicePixelRatio||1),my=(e.clientY-rect.top)*scaleY/(window.devicePixelRatio||1),pts=c._chartPoints||[],best=null,dist=Infinity,j;
       for(j=0;j<pts.length;j++){var dx=pts[j].x-mx,dy=pts[j].y-my,dd=Math.sqrt(dx*dx+dy*dy);if(dd<dist){dist=dd;best=pts[j];}}
       var tip=document.getElementById('tip');
-      if(best&&dist<18){var p=best.data;tip.innerHTML='<strong>'+esc(p.name)+'</strong><br>Variation : '+(p.amount>=0?'+':'')+money(p.amount)+'<br>Total cumulé : '+money(p.total)+'<br>Personne : '+esc(personName(p.person))+'<br>Produit : '+esc(productName(p.product))+'<br>Date : '+esc(fmtDate(p.date));tip.style.display='block';tip.style.left=Math.min(e.clientX+12,window.innerWidth-320)+'px';tip.style.top=Math.min(e.clientY+12,window.innerHeight-150)+'px';}else{tip.style.display='none';}
+      if(best&&dist<18){var p=best.data;tip.innerHTML='<strong>'+esc(p.name)+'</strong><br>Variation : '+(p.amount>=0?'+':'')+money(p.amount)+'<br>Total cumulé : '+money(p.total)+'<br>Personne : '+esc(personName(p.giver))+' → '+esc(personName(p.receiver))+'<br>Produit : '+esc(productName(p.product))+'<br>Date : '+esc(fmtDate(p.date));tip.style.display='block';tip.style.left=Math.min(e.clientX+12,window.innerWidth-320)+'px';tip.style.top=Math.min(e.clientY+12,window.innerHeight-150)+'px';}else{tip.style.display='none';}
     });
     document.getElementById('timeChart').addEventListener('mouseleave',function(){document.getElementById('tip').style.display='none';});
     window.addEventListener('resize',function(){updateFinance();drawTimeChart();});
@@ -748,7 +704,7 @@
       if(finance){document.getElementById('ca').value=finance.ca == null ? 15000 : finance.ca;document.getElementById('charges').value=finance.charges == null ? 9000 : finance.charges;document.getElementById('objectif').value=finance.objectif == null ? 18000 : finance.objectif;}
       document.getElementById('currencySearch').value=selectedCurrency;document.getElementById('selectedCurrencyText').textContent='Devise sélectionnée : '+selectedCurrency;
       document.getElementById('gainDate').value=nowInput();document.getElementById('offerDate').value=nowInput();
-      normalizeRecords();refreshPersonSelects();refreshProductSelect();displayPeople();displayOffers();displayHistory();displayTrades();displayDirectory();updateFinance();calculateTrade();drawTimeChart();updateNewSummary();updateCalculator();updateAnalyses();setupDefinitions();
+      normalizeRecords();refreshPersonSelects();refreshProductSelect();displayPeople();displayOffers();displayHistory();displayTrades();displayDirectory();updateFinance();calculateTrade();drawTimeChart();setupDefinitions();updateExtraSections();
     }());
   </script>
 </body>
